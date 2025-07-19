@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 app.use('/apps', express.static(path.join(__dirname, 'apps')));
 app.use('/flags', express.static(path.join(__dirname, 'flags')));
 
-app.use(['/apps/:file', '/flags/:file'], (req, res) => {
+app.use('/', (req, res) => {
   const fallback = path.join(__dirname, 'apps', '1cp.png');
   res.sendFile(fallback);
 });
