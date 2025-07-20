@@ -5,6 +5,7 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.use('/aplikasi', express.static(path.join(__dirname, 'aplikasi')));
 app.use('/apps', express.static(path.join(__dirname, 'apps')));
 app.use('/flags', express.static(path.join(__dirname, 'flags')));
 
