@@ -20,7 +20,7 @@ app.use('/flags', express.static(path.join(__dirname, 'flags'), {
   immutable: true
 }));
 
-app.use('/game', express.static(path.join(__dirname, 'game'), {
+app.use('/h2h', express.static(path.join(__dirname, 'h2h'), {
   maxAge: '1d',
   immutable: true
 }));
