@@ -20,6 +20,11 @@ app.use('/flags', express.static(path.join(__dirname, 'flags'), {
   immutable: true
 }));
 
+app.use('/game', express.static(path.join(__dirname, 'game'), {
+  maxAge: '1d',
+  immutable: true
+}));
+
 app.get('*', (req, res) => {
   res.setHeader('Cache-Control', 'public, max-age=86400, immutable');
   const fallback = path.join(__dirname, 'favicon_icon.png');
