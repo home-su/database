@@ -6,23 +6,19 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use('/aplikasi', express.static(path.join(__dirname, 'aplikasi'), {
-  maxAge: '1d',
-  immutable: true
+  maxAge: '1d'
 }));
 
 app.use('/apps', express.static(path.join(__dirname, 'apps'), {
-  maxAge: '1d',
-  immutable: true
+  maxAge: '1d'
 }));
 
 app.use('/flags', express.static(path.join(__dirname, 'flags'), {
-  maxAge: '1d',
-  immutable: true
+  maxAge: '1d'
 }));
 
 app.use('/h2h', express.static(path.join(__dirname, 'h2h'), {
-  maxAge: '1d',
-  immutable: true
+  maxAge: '1d'
 }));
 
 app.get('*', (req, res) => {
