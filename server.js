@@ -22,7 +22,7 @@ app.use('/h2h', express.static(path.join(__dirname, 'h2h'), {
   maxAge: '1d'
 }));
 
-app.get("/mutasiqris", async (req, res) => {
+app.get("/mutasi", async (req, res) => {
   try {
     const result = await new orkut("nenengkurniasih", "2239440:0isrWp3wuBCgIXvUlNLdtJGH41EcS6bO").getFormattedMutasiQris();
     res.json(result);
