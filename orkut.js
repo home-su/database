@@ -1,110 +1,63 @@
-const axios = require('axios');
-const qs = require('qs');
+const axios = require("axios");
 
-class OrderKuota {
-    static API_URL = 'https://app.orderkuota.com:443/api/v2';
-    static API_URL_ORDER = 'https://app.orderkuota.com:443/api/v2/order';
-    static HOST = 'app.orderkuota.com';
-    static USER_AGENT = 'okhttp/4.10.0';
-    static APP_VERSION_NAME = '25.03.14';
-    static APP_VERSION_CODE = '250314';
-    static APP_REG_ID = 'di309HvATsaiCppl5eDpoc:APA91bFUcTOH8h2XHdPRz2qQ5Bezn-3_TaycFcJ5pNLGWpmaxheQP9Ri0E56wLHz0_b1vcss55jbRQXZgc9loSfBdNa5nZJZVMlk7GS1JDMGyFUVvpcwXbMDg8tjKGZAurCGR4kDMDRJ';
-
-    constructor(username = null, authToken = null) {
-        this.username = username;
-        this.authToken = authToken;
+const config = {
+    base: "https://app.orderkuota.com",
+    app: {
+        reg_id: "cichfWtKQUGktdmFffqv52:APA91bE7M6D8u5u_f6YlqQuHavBZHX-v-Ax8SDDp8XYIIzYk46PVta64MJxdVq294rRQnPTKDz1mWog4TVteGbowCVP-LpBoabfMzEP2duZrsExQzdd_EK4",
+        version_code: "250811",
+        version_name: "25.08.11"
+    },
+    phone: {
+        uuid: "cichfWtKQUGktdmFffqv52",
+        model: "V2120",
+        version: "12",
+        mode: "dark"
     }
+};
 
-    async loginRequest(username, password) {
-        const payload = qs.stringify({
-            username,
-            password,
-            app_reg_id: OrderKuota.APP_REG_ID,
-            app_version_code: OrderKuota.APP_VERSION_CODE,
-            app_version_name: OrderKuota.APP_VERSION_NAME,
+async function mutasi(username, token) {
+    const timestamp = Date.now().toString();
+    const body = new URLSearchParams({
+        'requests[qris_history][jumlah]': '',
+        'requests[qris_history][jenis]': '',
+        'requests[qris_history][page]': 1,
+        'requests[qris_history][dari_tanggal]': '',
+        'requests[qris_history][ke_tanggal]': '',
+        'requests[qris_history][keterangan]': '',
+        'request_time': timestamp,
+        'app_reg_id': config.app.reg_id,
+        'phone_android_version': config.phone.version,
+        'app_version_code': config.app.version_code,
+        'phone_uuid': config.phone.uuid,
+        'auth_username': username,
+        'auth_token': token,
+        'app_version_name': config.app.version_name,
+        'ui_mode': config.phone.mode,
+        'requests[0]': 'account',
+        'phone_model': config.phone.model
+    }).toString();
+
+    try {
+        const response = await axios({
+            method: 'post',
+            url: '/api/v2/qris/mutasi/' + token.split(":")[0],
+            baseURL: config.base,
+            headers: {
+                'content-type': 'application/x-www-form-urlencoded',
+                'content-length': Buffer.byteLength(body),
+                'accept-encoding': 'gzip',
+                'user-agent': 'okhttp/4.12.0'
+            },
+            data: body
         });
-
-        return this.request("POST", `${OrderKuota.API_URL}/login`, payload, true);
-    }
-
-    async getAuthToken(username, otp) {
-        const payload = qs.stringify({
-            username,
-            password: otp,
-            app_reg_id: OrderKuota.APP_REG_ID,
-            app_version_code: OrderKuota.APP_VERSION_CODE,
-            app_version_name: OrderKuota.APP_VERSION_NAME,
-        });
-
-        return this.request("POST", `${OrderKuota.API_URL}/login`, payload, true);
-    }
-
-    async getTransactionQris(type = '') {
-        const payload = qs.stringify({
-            auth_token: this.authToken,
-            auth_username: this.username,
-            'requests[qris_history][jumlah]': '',
-            'requests[qris_history][jenis]': type,
-            'requests[qris_history][page]': 1,
-            'requests[qris_history][dari_tanggal]': '',
-            'requests[qris_history][ke_tanggal]': '',
-            'requests[qris_history][keterangan]': '',
-            'requests[0]': 'account',
-            app_version_name: OrderKuota.APP_VERSION_NAME,
-            app_version_code: OrderKuota.APP_VERSION_CODE,
-            app_reg_id: OrderKuota.APP_REG_ID,
-        });
-
-        return this.request("POST", `${OrderKuota.API_URL}/get`, payload, true);
-    }
-
-    async withdrawalQris(amount = '') {
-        const payload = qs.stringify({
-            app_reg_id: OrderKuota.APP_REG_ID,
-            app_version_code: OrderKuota.APP_VERSION_CODE,
-            auth_username: this.username,
-            'requests[qris_withdraw][amount]': amount,
-            auth_token: this.authToken,
-            app_version_name: OrderKuota.APP_VERSION_NAME,
-        });
-
-        return this.request("POST", `${OrderKuota.API_URL}/get`, payload, true);
-    }
-
-    buildHeaders() {
+        return response.data;
+    } catch (error) {
+        console.error(error);
         return {
-            'Host': OrderKuota.HOST,
-            'User-Agent': OrderKuota.USER_AGENT,
-            'Content-Type': 'application/x-www-form-urlencoded',
-        };
-    }
-
-    async request(method = 'GET', url, data = null, useHeaders = false) {
-        try {
-            const options = {
-                method,
-                url,
-                headers: useHeaders ? this.buildHeaders() : {},
-                data,
-                timeout: 15000,
-            };
-
-            const response = await axios(options);
-            return response.data;
-        } catch (error) {
-            return {
-                error: true,
-                message: error.message,
-                details: error.response?.data || null,
-            };
+            success: false,
+            message: "Terjadi kesalahan harap periksa logs"
         }
-    }
-
-    async getFormattedMutasiQris() {
-        const raw = await this.getTransactionQris();
-        const history = raw?.qris_history?.results || [];
-        return history
     }
 }
 
-module.exports = OrderKuota;
+module.exports = { mutasi }

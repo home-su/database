@@ -7,28 +7,37 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use('/aplikasi', express.static(path.join(__dirname, 'aplikasi'), {
-  maxAge: '1d'
+    maxAge: '1d'
 }));
 
 app.use('/apps', express.static(path.join(__dirname, 'apps'), {
-  maxAge: '1d'
+    maxAge: '1d'
 }));
 
 app.use('/flags', express.static(path.join(__dirname, 'flags'), {
-  maxAge: '1d'
+    maxAge: '1d'
 }));
 
 app.use('/h2h', express.static(path.join(__dirname, 'h2h'), {
-  maxAge: '1d'
+    maxAge: '1d'
 }));
 
 app.get("/mutasi", async (req, res) => {
-  try {
-    const result = await new orkut("nenengkurniasih", "2239440:0isrWp3wuBCgIXvUlNLdtJGH41EcS6bO").getFormattedMutasiQris();
-    res.json(result);
-  } catch (err) {
-    res.status(500).json([]);
-  }
+    try {
+        const { username, token } = req.query;
+        if (!username && !token) return res.json({
+            success: false,
+            message: "Masukan parameter username & token"
+        })
+        const result = await orkut.mutasi(username, token)
+        res.json(result)
+    } catch (error) {
+        console.error(error)
+        res.json({
+            success: false,
+            message: "Telah terjadi kesalahan pada sistem"
+        })
+    }
 });
 
 app.get('*', (req, res) => {
